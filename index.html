@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Premium - Pesquisa Musicoterapia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+        
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(31, 38, 135, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        @media (min-width: 768px) {
+            .card {
+                padding: 28px;
+            }
+        }
+        
+        .stat-card {
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(31, 38, 135, 0.5);
+        }
+        
+        .insight-card {
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .insight-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .insight-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .insight-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(31, 38, 135, 0.5);
+        }
+        
+        .insight-card:hover .icon-box {
+            transform: rotate(6deg) scale(1.05);
+        }
+        
+        .insight-card.insight-green::before {
+            background: linear-gradient(90deg, #10b981, #059669);
+        }
+        
+        .insight-card.insight-orange::before {
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+        }
+        
+        .insight-card.insight-blue::before {
+            background: linear-gradient(90deg, #3b82f6, #2563eb);
+        }
+        
+        .insight-card.insight-purple::before {
+            background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+        }
+        
+        canvas {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        canvas:hover {
+            transform: scale(1.03);
+            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.15));
+        }
+        
+        .pie-chart-container {
+            transition: all 0.3s ease;
+        }
+        
+        .pie-chart-container:hover {
+            transform: translateY(-4px);
+        }
+        
+        /* Modal de Artigos */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .modal-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: scaleIn 0.3s ease-out;
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 24px 32px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            color: white;
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+        
+        .modal-body {
+            padding: 32px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .modal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .modal-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .modal-body::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+        }
+        
+        .modal-body::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #764ba2, #667eea);
+        }
+        
+        .artigo-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid;
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .artigo-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .artigo-purple {
+            border-left-color: #8b5cf6;
+        }
+        
+        .artigo-blue {
+            border-left-color: #3b82f6;
+        }
+        
+        .artigo-numero {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 16px;
+            color: white;
+        }
+        
+        .artigo-purple .artigo-numero {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+        
+        .artigo-blue .artigo-numero {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+        
+        .artigo-titulo {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0 0 12px 0;
+            line-height: 1.5;
+            padding-right: 50px;
+        }
+        
+        .artigo-fonte {
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+        
+        .artigo-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        .artigo-btn:hover {
+            background: linear-gradient(135deg, #764ba2, #667eea);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .modal-footer {
+            padding: 20px 32px;
+            border-top: 1px solid #e5e7eb;
+            background: #f9fafb;
+            border-radius: 0 0 20px 20px;
+        }
+        
+        .modal-count {
+            text-align: center;
+            color: #6b7280;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .modal-container {
+                max-width: 95vw;
+                max-height: 85vh;
+            }
+            
+            .modal-header {
+                padding: 20px;
+            }
+            
+            .modal-title {
+                font-size: 18px;
+            }
+            
+            .modal-body {
+                padding: 20px;
+            }
+            
+            .artigo-card {
+                padding: 20px;
+            }
+            
+            .artigo-titulo {
+                font-size: 15px;
+                padding-right: 45px;
+            }
+            
+            .artigo-numero {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+        }
+        
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        @media (min-width: 768px) {
+            .header {
+                padding: 36px;
+            }
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .grid-2 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .grid-4 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        @media (min-width: 640px) {
+            .grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .grid-4 {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:active {
+            transform: scale(0.95);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #374151;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .btn-secondary:hover {
+            background: #f9fafb;
+            border-color: #8b5cf6;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+        
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
+        
+        select {
+            width: 100%;
+            padding: 12px 45px 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            font-size: 14px;
+            font-weight: 500;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238b5cf6' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+        }
+        
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #4b5563;
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+        }
+        
+        .chart-bar {
+            min-height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            color: white;
+            font-weight: 700;
+            margin-bottom: 14px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .chart-bar:hover {
+            transform: translateX(8px);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            padding: 14px 12px;
+            text-align: left;
+            font-weight: 700;
+            color: #1f2937;
+            white-space: nowrap;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        
+        td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        tr:hover {
+            background: #f9fafb;
+        }
+        
+        .hide {
+            display: none;
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+        
+        @media (min-width: 768px) {
+            h1 {
+                font-size: 36px;
+            }
+        }
+        
+        h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: -0.3px;
+        }
+        
+        h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #6b7280;
+            margin-bottom: 10px;
+            letter-spacing: 0.2px;
+        }
+        
+        .icon-box {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+        
+        .icon-box:hover {
+            transform: rotate(5deg) scale(1.05);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        .search-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 12px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            min-width: 320px;
+            max-width: 400px;
+            z-index: 1000;
+            padding: 8px;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .search-item {
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 6px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: start;
+            gap: 12px;
+        }
+        
+        .search-item:hover {
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            transform: translateX(4px);
+        }
+        
+        .search-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 12px;
+        }
+        
+        .footer-grid p {
+            font-size: 13px;
+            font-weight: 500;
+            color: #6b7280;
+            margin: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Estados dos botões Resumo/Detalhes */
+        .btn-active {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
+            color: white !important;
+            border: 2px solid transparent !important;
+        }
+        
+        .btn-active:hover {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+        }
+        
+        .btn-inactive {
+            background: white !important;
+            color: #374151 !important;
+            border: 2px solid #e5e7eb !important;
+        }
+        
+        .btn-inactive:hover {
+            background: #f9fafb !important;
+            border-color: #d1d5db !important;
+        }
+        
+        /* Responsividade Mobile - Canvas */
+        @media (max-width: 640px) {
+            canvas {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+            
+            /* Correção 6: Botões menores em mobile */
+            .btn {
+                font-size: 13px;
+                padding: 10px 18px;
+            }
+            .btn svg {
+                width: 18px;
+                height: 18px;
+            }
+        }
+        
+        /* Correção 3: Dropdown mobile */
+        @media (max-width: 420px) {
+            .search-dropdown {
+                min-width: calc(100vw - 40px);
+                max-width: calc(100vw - 40px);
+                left: 50%;
+                right: auto;
+                transform: translateX(-50%);
+            }
+        }
+        
+        /* Correção 5: Título e ícone em mobile muito pequeno */
+        @media (max-width: 380px) {
+            h1 {
+                font-size: 24px !important;
+            }
+            .icon-box {
+                width: 48px;
+                height: 48px;
+            }
+            .icon-box svg {
+                width: 28px;
+                height: 28px;
+            }
+        }
+        
+        /* Correção 4: Ellipsis nas barras */
+        .chart-bar {
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header animate-fade-in">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
+                <div style="flex: 1; min-width: 280px;">
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                        <div class="icon-box" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                <path d="M9 18V5l12-2v13"/>
+                                <circle cx="6" cy="18" r="3"/>
+                                <circle cx="18" cy="16" r="3"/>
+                            </svg>
+                        </div>
+                        <h1>Pesquisa sobre Musicoterapia</h1>
+                    </div>
+                    <p style="color: #6b7280; font-size: 15px; line-height: 1.6; font-weight: 500;">
+                        Análise do conhecimento populacional sobre musicoterapia - Campo Grande, RJ
+                    </p>
+                    <p style="color: #9ca3af; font-size: 13px; margin-top: 8px; font-weight: 500;">
+                        Projeto de Extensão | Universidade Estácio de Sá | Curso de Psicologia | 2025
+                    </p>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 12px; position: relative;">
+                    <button id="btnResumo" class="btn btn-active" onclick="mostrarResumo()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <line x1="18" y1="20" x2="18" y2="10"/>
+                            <line x1="12" y1="20" x2="12" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
+                        Resumo
+                    </button>
+                    <button id="btnDetalhes" class="btn btn-inactive" onclick="mostrarDetalhes()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <rect x="3" y="3" width="7" height="7" rx="1"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1"/>
+                        </svg>
+                        Detalhes
+                    </button>
+                    <button class="btn btn-success" onclick="toggleSearch()" id="btnPesquisar">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="m21 21-4.35-4.35"/>
+                        </svg>
+                        Pesquisar
+                    </button>
+                    
+                    <!-- Dropdown de Pesquisa -->
+                    <div id="searchDropdown" class="search-dropdown hide">
+                        <div style="padding: 12px 16px; border-bottom: 2px solid #e5e7eb; margin-bottom: 8px;">
+                            <h3 style="margin: 0; font-size: 16px; color: #1f2937;">📚 Recursos para Aprofundamento</h3>
+                        </div>
+                        
+                        <a href="https://www.musictherapy.org/" target="_blank" class="search-item">
+                            <div style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #8b5cf6, #7c3aed); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="2" y1="12" x2="22" y2="12"/>
+                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                                </svg>
+                            </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-weight: 600; font-size: 13px; color: #1f2937; margin-bottom: 2px;">AMTA</div>
+                                <div style="font-size: 12px; color: #6b7280; line-height: 1.4;">Associação Americana de Musicoterapia</div>
+                            </div>
+                        </a>
+                        
+                        <a href="https://scholar.google.com/scholar?q=musicoterapia" target="_blank" class="search-item">
+                            <div style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #3b82f6, #2563eb); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                </svg>
+                            </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-weight: 600; font-size: 13px; color: #1f2937; margin-bottom: 2px;">Google Scholar</div>
+                                <div style="font-size: 12px; color: #6b7280; line-height: 1.4;">Artigos científicos sobre musicoterapia</div>
+                            </div>
+                        </a>
+                        
+                        <a href="https://www.ubam.org.br/" target="_blank" class="search-item">
+                            <div style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #10b981, #059669); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                    <circle cx="12" cy="10" r="3"/>
+                                </svg>
+                            </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-weight: 600; font-size: 13px; color: #1f2937; margin-bottom: 2px;">UBAM Brasil</div>
+                                <div style="font-size: 12px; color: #6b7280; line-height: 1.4;">União Brasileira de Musicoterapia</div>
+                            </div>
+                        </a>
+                        
+                        <a href="https://pubmed.ncbi.nlm.nih.gov/?term=music+therapy" target="_blank" class="search-item">
+                            <div style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                </svg>
+                            </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-weight: 600; font-size: 13px; color: #1f2937; margin-bottom: 2px;">PubMed</div>
+                                <div style="font-size: 12px; color: #6b7280; line-height: 1.4;">Estudos científicos e médicos</div>
+                            </div>
+                        </a>
+                        
+                        <a href="https://www.youtube.com/results?search_query=musicoterapia+beneficios" target="_blank" class="search-item">
+                            <div style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #ef4444, #dc2626); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                    <polygon points="5 3 19 12 5 21 5 3"/>
+                                </svg>
+                            </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-weight: 600; font-size: 13px; color: #1f2937; margin-bottom: 2px;">Vídeos</div>
+                                <div style="font-size: 12px; color: #6b7280; line-height: 1.4;">Conteúdo educacional em vídeo</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="card animate-fade-in">
+            <h2>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.5">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                </svg>
+                Filtros de Análise
+            </h2>
+            <div class="grid-4">
+                <div>
+                    <label>Gênero</label>
+                    <select id="filtroGenero" onchange="aplicarFiltros()">
+                        <option value="todos">Todos</option>
+                        <option value="Feminino">Feminino</option>
+                        <option value="Masculino">Masculino</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Faixa Etária</label>
+                    <select id="filtroIdade" onchange="aplicarFiltros()">
+                        <option value="todos">Todas as idades</option>
+                        <option value="20-30">20-30 anos</option>
+                        <option value="31-40">31-40 anos</option>
+                        <option value="41-45">41-45 anos</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Pergunta 1</label>
+                    <select id="filtroP1" onchange="aplicarFiltros()">
+                        <option value="todos">Todas</option>
+                        <option value="Sim">Sim</option>
+                        <option value="Não">Não</option>
+                    </select>
+                </div>
+                <div style="display: flex; align-items: flex-end;">
+                    <div style="background: linear-gradient(135deg, #ede9fe, #ddd6fe); padding: 16px 24px; border-radius: 12px; width: 100%; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);">
+                        <div style="font-size: 12px; color: #6b21a8; margin-bottom: 4px; font-weight: 700; letter-spacing: 0.5px;">RESULTADOS</div>
+                        <div id="totalParticipantes" style="color: #6b21a8; font-weight: 800; font-size: 22px;">25 participantes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visualização Resumo -->
+        <div id="viewResumo">
+            <!-- Cards de Estatísticas -->
+            <div class="grid-4 animate-fade-in" style="margin-bottom: 20px;">
+                <div class="card stat-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div class="icon-box" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                        </div>
+                        <span class="badge badge-info" id="badgeTotal">25</span>
+                    </div>
+                    <h3>Total de Participantes</h3>
+                    <div style="font-size: 28px; font-weight: 800; color: #1f2937; margin: 10px 0;">
+                        <span id="statTotal">25</span> pessoas
+                    </div>
+                    <div style="font-size: 12px; color: #6b7280; margin-top: 10px; font-weight: 600;" id="statGenero">
+                        19 mulheres · 6 homens
+                    </div>
+                </div>
+
+                <div class="card stat-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div class="icon-box" style="background: linear-gradient(135deg, #10b981, #059669);">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="16" y1="2" x2="16" y2="6"/>
+                                <line x1="8" y1="2" x2="8" y2="6"/>
+                                <line x1="3" y1="10" x2="21" y2="10"/>
+                            </svg>
+                        </div>
+                        <span class="badge badge-success" id="badgeIdade">31</span>
+                    </div>
+                    <h3>Idade Média</h3>
+                    <div style="font-size: 28px; font-weight: 800; color: #1f2937; margin: 10px 0;">
+                        <span id="statIdadeMedia">31</span> anos
+                    </div>
+                    <div style="font-size: 12px; color: #6b7280; margin-top: 10px; font-weight: 600;">
+                        Faixa: 20-45 anos
+                    </div>
+                </div>
+
+                <div class="card stat-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div class="icon-box" style="background: linear-gradient(135deg, #10b981, #059669);">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                        </div>
+                        <span class="badge badge-success" id="badgeP1">68%</span>
+                    </div>
+                    <h3>Já Ouviram Falar</h3>
+                    <div style="font-size: 28px; font-weight: 800; color: #1f2937; margin: 10px 0;">
+                        <span id="statP1Sim">17</span> pessoas
+                    </div>
+                    <div style="font-size: 12px; color: #6b7280; margin-top: 10px; font-weight: 600;" id="statP1Nao">
+                        8 não conheciam (32%)
+                    </div>
+                </div>
+
+                <div class="card stat-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div class="icon-box" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>
+                        </div>
+                        <span class="badge badge-warning" id="badgeP2">60%</span>
+                    </div>
+                    <h3>Conhecimento Superficial</h3>
+                    <div style="font-size: 28px; font-weight: 800; color: #1f2937; margin: 10px 0;">
+                        <span id="statP2JaOuviu">15</span> pessoas
+                    </div>
+                    <div style="font-size: 12px; color: #6b7280; margin-top: 10px; font-weight: 600;">
+                        Já ouviram mas não sabem ao certo
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos -->
+            <div class="grid-2 animate-fade-in" style="margin-bottom: 20px;">
+                <div class="card pie-chart-container">
+                    <h2>P1: Já ouviu falar sobre musicoterapia?</h2>
+                    <canvas id="chartP1"></canvas>
+                    <div style="display: flex; justify-content: space-around; margin-top: 24px; flex-wrap: wrap; gap: 20px;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 32px; font-weight: 800; color: #10b981;">
+                                <span id="numP1Sim">17</span>
+                            </div>
+                            <div style="color: #6b7280; font-size: 14px; font-weight: 600;">Sim (<span id="percP1Sim">68</span>%)</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 32px; font-weight: 800; color: #ef4444;">
+                                <span id="numP1Nao">8</span>
+                            </div>
+                            <div style="color: #6b7280; font-size: 14px; font-weight: 600;">Não (<span id="percP1Nao">32</span>%)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card pie-chart-container">
+                    <h2>P2: Nível de conhecimento</h2>
+                    <canvas id="chartP2"></canvas>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px; text-align: center;">
+                        <div>
+                            <div style="font-size: 28px; font-weight: 800; color: #8b5cf6;">
+                                <span id="numP2Conhece">3</span>
+                            </div>
+                            <div style="color: #6b7280; font-size: 12px; font-weight: 600;">Conhece (<span id="percP2Conhece">12</span>%)</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 28px; font-weight: 800; color: #f59e0b;">
+                                <span id="numP2JaOuviu">15</span>
+                            </div>
+                            <div style="color: #6b7280; font-size: 12px; font-weight: 600;">Já ouvi (<span id="percP2JaOuviu">60</span>%)</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 28px; font-weight: 800; color: #ef4444;">
+                                <span id="numP2NaoConhece">7</span>
+                            </div>
+                            <div style="color: #6b7280; font-size: 12px; font-weight: 600;">Não conhece (<span id="percP2NaoConhece">28</span>%)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico de Barras -->
+            <div class="card animate-fade-in" style="margin-bottom: 20px;">
+                <h2>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.5">
+                        <line x1="12" y1="20" x2="12" y2="10"/>
+                        <line x1="18" y1="20" x2="18" y2="4"/>
+                        <line x1="6" y1="20" x2="6" y2="16"/>
+                    </svg>
+                    Análise Comparativa das Respostas
+                </h2>
+                <div id="chartComparativo"></div>
+            </div>
+
+            <!-- Cards de Insights -->
+            <div class="grid-4 animate-fade-in" style="margin-bottom: 20px;">
+                <div class="card insight-card insight-green" style="border-left: 5px solid #10b981;">
+                    <div style="margin-bottom: 16px;">
+                        <div class="icon-box" style="background: linear-gradient(135deg, #10b981, #059669);">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <h3>Reconhecimento Alto</h3>
+                    <p style="color: #6b7280; font-size: 14px; line-height: 1.6; font-weight: 500;">
+                        <span id="insightP1" style="font-weight: 700; color: #1f2937;">68%</span> dos participantes já ouviram falar sobre musicoterapia
+                    </p>
+                </div>
+                <div class="card insight-card insight-orange" style="border-left: 5px solid #f59e0b;">
+                    <div style="margin-bottom: 16px;">
+                        <div class="icon-box" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <h3>Conhecimento Superficial</h3>
+                    <p style="color: #6b7280; font-size: 14px; line-height: 1.6; font-weight: 500;">
+                        <span id="insightP2" style="font-weight: 700; color: #1f2937;">60%</span> já ouviram falar mas não conhecem a fundo
+                    </p>
+                </div>
+                <div class="card insight-card insight-blue" style="border-left: 5px solid #3b82f6;">
+                    <div style="margin-bottom: 16px;">
+                        <div class="icon-box" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <h3>Crença Positiva</h3>
+                    <p style="color: #6b7280; font-size: 14px; line-height: 1.6; font-weight: 500;">
+                        <span id="insightP3" style="font-weight: 700; color: #1f2937;">94%</span> acreditam que a música contribui para o desenvolvimento
+                    </p>
+                </div>
+                <div class="card insight-card insight-purple" style="border-left: 5px solid #8b5cf6;">
+                    <div style="margin-bottom: 16px;">
+                        <div class="icon-box" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                                <circle cx="12" cy="12" r="10"/>
+                                <circle cx="12" cy="12" r="6"/>
+                                <circle cx="12" cy="12" r="2"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <h3>Oportunidade</h3>
+                    <p style="color: #6b7280; font-size: 14px; line-height: 1.6; font-weight: 500;">
+                        Alta consciência sobre música, mas baixo conhecimento técnico sobre musicoterapia
+                    </p>
+                </div>
+            </div>
+
+            <!-- P3 e Gênero -->
+            <div class="grid-2 animate-fade-in">
+                <div class="card pie-chart-container">
+                    <h2>P3: Música contribui?</h2>
+                    <canvas id="chartP3"></canvas>
+                    <div style="display: flex; justify-content: space-around; margin-top: 24px; flex-wrap: wrap; gap: 20px;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 32px; font-weight: 800; color: #3b82f6;">
+                                <span id="numP3Sim">24</span>
+                            </div>
+                            <div style="color: #6b7280; font-size: 14px; font-weight: 600;">Sim (<span id="percP3Sim">94</span>%)</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 32px; font-weight: 800; color: #ef4444;">
+                                <span id="numP3Nao">1</span>
+                            </div>
+                            <div style="color: #6b7280; font-size: 14px; font-weight: 600;">Não (<span id="percP3Nao">6</span>%)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card pie-chart-container">
+                    <h2>Distribuição por Gênero</h2>
+                    <canvas id="chartGenero"></canvas>
+                    <div style="display: flex; justify-content: space-around; margin-top: 24px; flex-wrap: wrap; gap: 20px;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 32px; font-weight: 800; color: #ec4899;">
+                                <span id="numFeminino">19</span>
+                            </div>
+                            <div style="color: #6b7280; font-size: 14px; font-weight: 600;">Feminino (<span id="percFeminino">76</span>%)</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 32px; font-weight: 800; color: #3b82f6;">
+                                <span id="numMasculino">6</span>
+                            </div>
+                            <div style="color: #6b7280; font-size: 14px; font-weight: 600;">Masculino (<span id="percMasculino">24</span>%)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visualização Detalhes -->
+        <div id="viewDetalhes" class="hide">
+            <div class="card animate-fade-in">
+                <h2>Dados Detalhados dos Participantes</h2>
+                <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                    <table id="tabelaDetalhes">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Idade</th>
+                                <th>Gênero</th>
+                                <th>P1: Já ouviu falar?</th>
+                                <th>P2: Nível conhecimento</th>
+                                <th>P3: Música contribui?</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoTabela">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="card" style="margin-top: 20px; padding: 24px 32px;">
+            <!-- Nome do Projeto -->
+            <h3 style="font-size: 14px; font-weight: 600; color: #4b5563; margin-bottom: 16px; line-height: 1.6; margin-top: 0;">
+                Musicoterapia como Ferramenta de Conscientização e Inclusão de Famílias de Crianças Atípicas e Não Atípicas
+            </h3>
+            
+            <!-- Professor + Equipe -->
+            <div class="footer-grid">
+                <p>Professor: Alexandre Villalba</p>
+                <p>Equipe: 10 estudantes</p>
+            </div>
+            
+            <!-- Lista de Alunos -->
+            <p style="font-size: 12px; font-weight: 400; color: #9ca3af; line-height: 1.6; margin-bottom: 16px;">
+                Equipe de Pesquisa: Anne Susan Cordeiro · Luiz Ribeiro · Cleidson Lima · Fernando Jerônimo · Leandro Santos · Felipe · Cirlei Crisp · Jefferson Pereira · Janoí · Eryck Medeiros
+            </p>
+            
+            <!-- Localização -->
+            <div style="border-top: 1px solid #e5e7eb; padding-top: 16px; margin-top: 16px;">
+                <p style="font-size: 11px; font-weight: 500; color: #9ca3af; text-align: center; margin: 0;">
+                    Campo Grande, Rio de Janeiro | 2025
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dadosOriginais = [
+            { id: 1, nome: "Juliana Santos", idade: 28, genero: "Feminino", p1: "Sim", p2: "Já ouvi falar mas não sei ao certo", p3: "Sim" },
+            { id: 2, nome: "Mariana Oliveira", idade: 29, genero: "Feminino", p1: "Sim", p2: "Não conheço", p3: "Sim" },
+            { id: 3, nome: "Patricia Costa", idade: 44, genero: "Feminino", p1: "Sim", p2: "Conhece bem", p3: "Sim" },
+            { id: 4, nome: "Ana Paula Lima", idade: 41, genero: "Feminino", p1: "Não", p2: "Já ouvi falar mas não sei ao certo", p3: "Sim" },
+            { id: 5, nome: "Fernanda Silva", idade: 22, genero: "Feminino", p1: "Não", p2: "Não conheço", p3: "Sim" },
+            { id: 6, nome: "Camila Rodrigues", idade: 27, genero: "Feminino", p1: "Não", p2: "Não conheço", p3: "Sim" },
+            { id: 7, nome: "Bruna Alves", idade: 43, genero: "Feminino", p1: "Não", p2: "Já ouvi falar mas não sei ao certo", p3: "Sim" },
+            { id: 8, nome: "Larissa Pereira", idade: 38, genero: "Feminino", p1: "Sim", p2: "Já ouvi falar mas não sei ao certo", p3: "Sim" },
+            { id: 9, nome: "Renata Souza", idade: 22, genero: "Feminino", p1: "Sim", p2: "Não conheço", p3: "Sim" },
+            { id: 10, nome: "Tatiana Ferreira", idade: 34, genero: "Feminino", p1: "Sim", p2: "Não conheço", p3: "Sim" },
+            { id: 11, nome: "Vanessa Martins", idade: 25, genero: "Feminino", p1: "Sim", p2: "Conhece bem", p3: "Sim" },
+            { id: 12, nome: "Adriana Ribeiro", idade: 23, genero: "Feminino", p1: "Sim", p2: "Não conheço", p3: "Sim" },
+            { id: 13, nome: "Cristina Cardoso", idade: 23, genero: "Feminino", p1: "Sim", p2: "Já ouvi falar mas não sei ao certo", p3: "Sim" },
+            { id: 14, nome: "Daniela Araujo", idade: 45, genero: "Feminino", p1: "Sim", p2: "Já ouvi falar mas não sei ao certo", p3: "Sim" },
+            { id: 15, nome: "Gabriela Nascimento", idade: 38, genero: "Feminino", p1: "Sim", p2: "Já ouvi falar mas não sei ao certo", p3: "Sim" },
+            { id: 16, nome: "Luciana Carvalho", idade: 34, genero: "Feminino", p1: "Sim", p2: "Já ouvi falar mas não sei ao certo", p3: "Sim" },
+            { id: 17, nome: "Monica Teixeira", idade: 45, genero: "Feminino", p1: "Sim", p2: "Não conheço", p3: "Sim" },
+            { id: 18, nome: "Priscila Freitas", idade: 32, genero: "Feminino", p1: "Sim", p2: "Já ouvi falar mas não sei ao certo", p3: "Sim" },
+            { id: 19, nome: "Simone Barbosa", idade: 27, genero: "Feminino", p1: "Sim", p2: "Já ouvi falar mas não sei ao certo", p3: "Sim" },
+            { id: 20, nome: "Carlos Eduardo", idade: 30, genero: "Masculino", p1: "Sim", p2: "Já ouvi falar mas não sei ao certo", p3: "Sim" },
+            { id: 21, nome: "Rodrigo Silva", idade: 24, genero: "Masculino", p1: "Não", p2: "Já ouvi falar mas não sei ao certo", p3: "Sim" },
+            { id: 22, nome: "Felipe Santos", idade: 37, genero: "Masculino", p1: "Sim", p2: "Já ouvi falar mas não sei ao certo", p3: "Sim" },
+            { id: 23, nome: "Lucas Oliveira", idade: 22, genero: "Masculino", p1: "Não", p2: "Já ouvi falar mas não sei ao certo", p3: "Não" },
+            { id: 24, nome: "Bruno Costa", idade: 34, genero: "Masculino", p1: "Sim", p2: "Já ouvi falar mas não sei ao certo", p3: "Sim" },
+            { id: 25, nome: "Rafael Lima", idade: 23, genero: "Masculino", p1: "Sim", p2: "Conhece bem", p3: "Sim" }
+        ];
+
+        let dadosFiltrados = [...dadosOriginais];
+
+        function desenharPizza(canvasId, dados, cores) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            
+            // Ajustar tamanho baseado no container (responsivo)
+            const container = canvas.parentElement;
+            const containerWidth = container.clientWidth;
+            const size = Math.min(containerWidth - 40, 400);
+            canvas.width = size;
+            canvas.height = size;
+            
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(centerX, centerY) - 40;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const total = dados.reduce((sum, item) => sum + item.value, 0);
+            let currentAngle = -Math.PI / 2;
+            
+            dados.forEach((item, index) => {
+                const sliceAngle = (2 * Math.PI * item.value) / total;
+                
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+                ctx.closePath();
+                ctx.fillStyle = cores[index];
+                ctx.fill();
+                
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                
+                const labelAngle = currentAngle + sliceAngle / 2;
+                const labelX = centerX + Math.cos(labelAngle) * (radius * 0.7);
+                const labelY = centerY + Math.sin(labelAngle) * (radius * 0.7);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 20px Inter';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                ctx.shadowBlur = 4;
+                ctx.fillText(item.percentual + '%', labelX, labelY);
+                ctx.shadowBlur = 0;
+                
+                currentAngle += sliceAngle;
+            });
+        }
+
+        function calcularEstatisticas() {
+            const total = dadosFiltrados.length;
+            const mulheres = dadosFiltrados.filter(d => d.genero === 'Feminino').length;
+            const homens = dadosFiltrados.filter(d => d.genero === 'Masculino').length;
+            
+            const p1Sim = dadosFiltrados.filter(d => d.p1 === 'Sim').length;
+            const p1Nao = dadosFiltrados.filter(d => d.p1 === 'Não').length;
+            
+            const p2Conhece = dadosFiltrados.filter(d => d.p2 === 'Conhece bem').length;
+            const p2JaOuviu = dadosFiltrados.filter(d => d.p2 === 'Já ouvi falar mas não sei ao certo').length;
+            const p2NaoConhece = dadosFiltrados.filter(d => d.p2 === 'Não conheço').length;
+            
+            const p3Sim = dadosFiltrados.filter(d => d.p3 === 'Sim').length;
+            const p3Nao = dadosFiltrados.filter(d => d.p3 === 'Não').length;
+            
+            const idadeMedia = Math.round(dadosFiltrados.reduce((acc, d) => acc + d.idade, 0) / total);
+            
+            return {
+                total, mulheres, homens, p1Sim, p1Nao,
+                p2Conhece, p2JaOuviu, p2NaoConhece,
+                p3Sim, p3Nao, idadeMedia
+            };
+        }
+
+        function atualizarDashboard() {
+            const stats = calcularEstatisticas();
+            
+            document.getElementById('totalParticipantes').textContent = stats.total + ' participantes';
+            document.getElementById('badgeTotal').textContent = stats.total;
+            document.getElementById('statTotal').textContent = stats.total;
+            document.getElementById('statGenero').textContent = `${stats.mulheres} mulheres · ${stats.homens} homens`;
+            
+            document.getElementById('badgeIdade').textContent = stats.idadeMedia;
+            document.getElementById('statIdadeMedia').textContent = stats.idadeMedia;
+            
+            document.getElementById('badgeP1').textContent = Math.round((stats.p1Sim/stats.total)*100) + '%';
+            document.getElementById('statP1Sim').textContent = stats.p1Sim;
+            document.getElementById('statP1Nao').textContent = `${stats.p1Nao} não conheciam (${Math.round((stats.p1Nao/stats.total)*100)}%)`;
+            
+            document.getElementById('badgeP2').textContent = Math.round((stats.p2JaOuviu/stats.total)*100) + '%';
+            document.getElementById('statP2JaOuviu').textContent = stats.p2JaOuviu;
+            
+            const dadosP1 = [
+                { value: stats.p1Sim, percentual: Math.round((stats.p1Sim/stats.total)*100) },
+                { value: stats.p1Nao, percentual: Math.round((stats.p1Nao/stats.total)*100) }
+            ];
+            desenharPizza('chartP1', dadosP1, ['#10b981', '#ef4444']);
+            
+            document.getElementById('numP1Sim').textContent = stats.p1Sim;
+            document.getElementById('percP1Sim').textContent = Math.round((stats.p1Sim/stats.total)*100);
+            document.getElementById('numP1Nao').textContent = stats.p1Nao;
+            document.getElementById('percP1Nao').textContent = Math.round((stats.p1Nao/stats.total)*100);
+            
+            const dadosP2 = [
+                { value: stats.p2Conhece, percentual: Math.round((stats.p2Conhece/stats.total)*100) },
+                { value: stats.p2JaOuviu, percentual: Math.round((stats.p2JaOuviu/stats.total)*100) },
+                { value: stats.p2NaoConhece, percentual: Math.round((stats.p2NaoConhece/stats.total)*100) }
+            ];
+            desenharPizza('chartP2', dadosP2, ['#8b5cf6', '#f59e0b', '#ef4444']);
+            
+            document.getElementById('numP2Conhece').textContent = stats.p2Conhece;
+            document.getElementById('percP2Conhece').textContent = Math.round((stats.p2Conhece/stats.total)*100);
+            document.getElementById('numP2JaOuviu').textContent = stats.p2JaOuviu;
+            document.getElementById('percP2JaOuviu').textContent = Math.round((stats.p2JaOuviu/stats.total)*100);
+            document.getElementById('numP2NaoConhece').textContent = stats.p2NaoConhece;
+            document.getElementById('percP2NaoConhece').textContent = Math.round((stats.p2NaoConhece/stats.total)*100);
+            
+            const dadosP3 = [
+                { value: stats.p3Sim, percentual: Math.round((stats.p3Sim/stats.total)*100) },
+                { value: stats.p3Nao, percentual: Math.round((stats.p3Nao/stats.total)*100) }
+            ];
+            desenharPizza('chartP3', dadosP3, ['#3b82f6', '#ef4444']);
+            
+            document.getElementById('numP3Sim').textContent = stats.p3Sim;
+            document.getElementById('percP3Sim').textContent = Math.round((stats.p3Sim/stats.total)*100);
+            document.getElementById('numP3Nao').textContent = stats.p3Nao;
+            document.getElementById('percP3Nao').textContent = Math.round((stats.p3Nao/stats.total)*100);
+            
+            const dadosGenero = [
+                { value: stats.mulheres, percentual: Math.round((stats.mulheres/stats.total)*100) },
+                { value: stats.homens, percentual: Math.round((stats.homens/stats.total)*100) }
+            ];
+            desenharPizza('chartGenero', dadosGenero, ['#ec4899', '#3b82f6']);
+            
+            document.getElementById('numFeminino').textContent = stats.mulheres;
+            document.getElementById('percFeminino').textContent = Math.round((stats.mulheres/stats.total)*100);
+            document.getElementById('numMasculino').textContent = stats.homens;
+            document.getElementById('percMasculino').textContent = Math.round((stats.homens/stats.total)*100);
+            
+            document.getElementById('insightP1').textContent = Math.round((stats.p1Sim/stats.total)*100) + '%';
+            document.getElementById('insightP2').textContent = Math.round((stats.p2JaOuviu/stats.total)*100) + '%';
+            document.getElementById('insightP3').textContent = Math.round((stats.p3Sim/stats.total)*100) + '%';
+            
+            atualizarGraficoComparativo(stats);
+            atualizarTabela();
+        }
+
+        function atualizarGraficoComparativo(stats) {
+            const container = document.getElementById('chartComparativo');
+            const maxWidth = 700;
+            
+            container.innerHTML = `
+                <div style="margin-bottom: 28px;">
+                    <div style="font-size: 14px; color: #4b5563; margin-bottom: 12px; font-weight: 700; letter-spacing: 0.3px;">P1: Já ouviu falar sobre musicoterapia</div>
+                    <div style="display: flex; gap: 12px;">
+                        <div class="chart-bar" style="background: linear-gradient(135deg, #10b981, #059669); width: ${Math.max((stats.p1Sim/stats.total)*maxWidth, 100)}px;">
+                            Sim: ${stats.p1Sim} (${Math.round((stats.p1Sim/stats.total)*100)}%)
+                        </div>
+                        <div class="chart-bar" style="background: linear-gradient(135deg, #ef4444, #dc2626); width: ${Math.max((stats.p1Nao/stats.total)*maxWidth, 100)}px;">
+                            Não: ${stats.p1Nao} (${Math.round((stats.p1Nao/stats.total)*100)}%)
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-bottom: 28px;">
+                    <div style="font-size: 14px; color: #4b5563; margin-bottom: 12px; font-weight: 700; letter-spacing: 0.3px;">P2: Nível de conhecimento</div>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <div class="chart-bar" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); width: ${Math.max((stats.p2Conhece/stats.total)*maxWidth, 200)}px;">
+                            Conhece bem: ${stats.p2Conhece} (${Math.round((stats.p2Conhece/stats.total)*100)}%)
+                        </div>
+                        <div class="chart-bar" style="background: linear-gradient(135deg, #f59e0b, #d97706); width: ${Math.max((stats.p2JaOuviu/stats.total)*maxWidth, 140)}px;">
+                            Já ouvi falar: ${stats.p2JaOuviu} (${Math.round((stats.p2JaOuviu/stats.total)*100)}%)
+                        </div>
+                        <div class="chart-bar" style="background: linear-gradient(135deg, #ef4444, #dc2626); width: ${Math.max((stats.p2NaoConhece/stats.total)*maxWidth, 140)}px;">
+                            Não conheço: ${stats.p2NaoConhece} (${Math.round((stats.p2NaoConhece/stats.total)*100)}%)
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div style="font-size: 14px; color: #4b5563; margin-bottom: 12px; font-weight: 700; letter-spacing: 0.3px;">P3: Música contribui para desenvolvimento</div>
+                    <div style="display: flex; gap: 12px;">
+                        <div class="chart-bar" style="background: linear-gradient(135deg, #3b82f6, #2563eb); width: ${Math.max((stats.p3Sim/stats.total)*maxWidth, 100)}px;">
+                            Sim: ${stats.p3Sim} (${Math.round((stats.p3Sim/stats.total)*100)}%)
+                        </div>
+                        <div class="chart-bar" style="background: linear-gradient(135deg, #ef4444, #dc2626); width: ${Math.max((stats.p3Nao/stats.total)*maxWidth, 120)}px;">
+                            Não: ${stats.p3Nao} (${Math.round((stats.p3Nao/stats.total)*100)}%)
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function atualizarTabela() {
+            const tbody = document.getElementById('corpoTabela');
+            tbody.innerHTML = dadosFiltrados.map(item => `
+                <tr>
+                    <td><strong>${item.id}</strong></td>
+                    <td>${item.nome}</td>
+                    <td>${item.idade}</td>
+                    <td><span class="badge ${item.genero === 'Feminino' ? 'badge-danger' : 'badge-info'}">${item.genero}</span></td>
+                    <td><span class="badge ${item.p1 === 'Sim' ? 'badge-success' : 'badge-danger'}">${item.p1}</span></td>
+                    <td><span class="badge ${item.p2 === 'Conhece bem' ? 'badge-success' : item.p2 === 'Já ouvi falar mas não sei ao certo' ? 'badge-warning' : 'badge-danger'}">${item.p2}</span></td>
+                    <td><span class="badge ${item.p3 === 'Sim' ? 'badge-success' : 'badge-danger'}">${item.p3}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function aplicarFiltros() {
+            const filtroGenero = document.getElementById('filtroGenero').value;
+            const filtroIdade = document.getElementById('filtroIdade').value;
+            const filtroP1 = document.getElementById('filtroP1').value;
+            
+            dadosFiltrados = dadosOriginais.filter(item => {
+                const passaGenero = filtroGenero === 'todos' || item.genero === filtroGenero;
+                let passaIdade = true;
+                
+                if (filtroIdade === '20-30') passaIdade = item.idade >= 20 && item.idade <= 30;
+                else if (filtroIdade === '31-40') passaIdade = item.idade >= 31 && item.idade <= 40;
+                else if (filtroIdade === '41-45') passaIdade = item.idade >= 41 && item.idade <= 45;
+                
+                const passaP1 = filtroP1 === 'todos' || item.p1 === filtroP1;
+                
+                return passaGenero && passaIdade && passaP1;
+            });
+            
+            atualizarDashboard();
+        }
+
+        function mostrarResumo() {
+            document.getElementById('viewResumo').classList.remove('hide');
+            document.getElementById('viewDetalhes').classList.add('hide');
+            
+            // Alternar classes dos botões
+            document.getElementById('btnResumo').className = 'btn btn-active';
+            document.getElementById('btnDetalhes').className = 'btn btn-inactive';
+        }
+
+        function mostrarDetalhes() {
+            document.getElementById('viewResumo').classList.add('hide');
+            document.getElementById('viewDetalhes').classList.remove('hide');
+            
+            // Alternar classes dos botões
+            document.getElementById('btnResumo').className = 'btn btn-inactive';
+            document.getElementById('btnDetalhes').className = 'btn btn-active';
+        }
+
+        function toggleSearch() {
+            abreModal();
+        }
+        
+        function abreModal() {
+            const modal = document.getElementById('modalArtigos');
+            modal.classList.remove('hide');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function fechaModal() {
+            const modal = document.getElementById('modalArtigos');
+            modal.classList.add('hide');
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Fechar modal ao clicar no overlay
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('modalArtigos');
+            if (event.target === modal) {
+                fechaModal();
+            }
+        });
+        
+        // Fechar modal ao pressionar ESC
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                fechaModal();
+            }
+        });
+
+        window.onload = function() {
+            atualizarDashboard();
+        };
+        
+        // Recalcular canvas ao redimensionar (rotação de tela em mobile)
+        window.addEventListener('resize', function() {
+            atualizarDashboard();
+        });
+    </script>
+    <!-- Modal de Artigos Científicos -->
+    <div id="modalArtigos" class="modal-overlay hide">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                    </svg>
+                    Artigos Científicos sobre Musicoterapia
+                </h2>
+                <button class="modal-close" onclick="fechaModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="artigo-card artigo-purple">
+                    <div class="artigo-numero">1</div>
+                    <h3 class="artigo-titulo">Produção científica sobre musicoterapia: uma revisão bibliométrica</h3>
+                    <div class="artigo-fonte">📌 Revistas UFG</div>
+                    <a href="https://revistas.ufg.br/musica/article/view/72628" target="_blank" class="artigo-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        Abrir artigo
+                    </a>
+                </div>
+
+                <div class="artigo-card artigo-blue">
+                    <div class="artigo-numero">2</div>
+                    <h3 class="artigo-titulo">Musicoterapia e a reabilitação: estudo piloto com fratura de rádio</h3>
+                    <div class="artigo-fonte">📌 Revista de Musicoterapia</div>
+                    <a href="https://musicoterapia.revistademusicoterapia.mus.br/index.php/rbmt/article/view/242" target="_blank" class="artigo-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        Abrir artigo
+                    </a>
+                </div>
+
+                <div class="artigo-card artigo-purple">
+                    <div class="artigo-numero">3</div>
+                    <h3 class="artigo-titulo">Música no corpo: a que ritmo se aproximam musicoterapia e psicologia corporal?</h3>
+                    <div class="artigo-fonte">📌 Revista de Musicoterapia</div>
+                    <a href="https://musicoterapia.revistademusicoterapia.mus.br/index.php/rbmt/article/view/191" target="_blank" class="artigo-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        Abrir artigo
+                    </a>
+                </div>
+
+                <div class="artigo-card artigo-blue">
+                    <div class="artigo-numero">4</div>
+                    <h3 class="artigo-titulo">Musicoterapia em saúde mental: perspectivas de uma prática antimanicomial</h3>
+                    <div class="artigo-fonte">📌 Revista de Musicoterapia</div>
+                    <a href="https://musicoterapia.revistademusicoterapia.mus.br/index.php/rbmt/article/download/87/370/1114" target="_blank" class="artigo-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        Abrir artigo
+                    </a>
+                </div>
+
+                <div class="artigo-card artigo-purple">
+                    <div class="artigo-numero">5</div>
+                    <h3 class="artigo-titulo">Musicoterapia realmente funciona? Uma revisão sistemática</h3>
+                    <div class="artigo-fonte">📌 Revista da Fundarte</div>
+                    <a href="https://seer.fundarte.rs.gov.br/index.php/RevistadaFundarte/article/view/1475" target="_blank" class="artigo-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        Abrir artigo
+                    </a>
+                </div>
+
+                <div class="artigo-card artigo-blue">
+                    <div class="artigo-numero">6</div>
+                    <h3 class="artigo-titulo">Musicoterapia no Brasil</h3>
+                    <div class="artigo-fonte">📌 Revista de Musicoterapia</div>
+                    <a href="https://musicoterapia.revistademusicoterapia.mus.br/index.php/rbmt/article/view/378" target="_blank" class="artigo-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        Abrir artigo
+                    </a>
+                </div>
+
+                <div class="artigo-card artigo-purple">
+                    <div class="artigo-numero">7</div>
+                    <h3 class="artigo-titulo">Musicoterapia e intervenções baseadas em música no tratamento da dor aguda ou crônica</h3>
+                    <div class="artigo-fonte">📌 SciELO</div>
+                    <a href="https://www.scielo.br/j/brjp/a/hrVHjTgQ6NGcymF85mYfYwR/?format=pdf&lang=pt" target="_blank" class="artigo-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        Abrir artigo
+                    </a>
+                </div>
+
+                <div class="artigo-card artigo-blue">
+                    <div class="artigo-numero">8</div>
+                    <h3 class="artigo-titulo">Pesquisa em musicoterapia no cenário social brasileiro</h3>
+                    <div class="artigo-fonte">📌 Lume UFRGS</div>
+                    <a href="https://lume.ufrgs.br/handle/10183/70908" target="_blank" class="artigo-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        Abrir artigo
+                    </a>
+                </div>
+
+                <div class="artigo-card artigo-purple">
+                    <div class="artigo-numero">9</div>
+                    <h3 class="artigo-titulo">Dos usos terapêuticos da música à musicoterapia</h3>
+                    <div class="artigo-fonte">📌 Revista de Musicoterapia</div>
+                    <a href="https://musicoterapia.revistademusicoterapia.mus.br/index.php/rbmt/article/view/230" target="_blank" class="artigo-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        Abrir artigo
+                    </a>
+                </div>
+
+                <div class="artigo-card artigo-blue">
+                    <div class="artigo-numero">10</div>
+                    <h3 class="artigo-titulo">As múltiplas vozes da musicoterapia brasileira</h3>
+                    <div class="artigo-fonte">📌 Periódicos UNESPAR</div>
+                    <a href="https://periodicos.unespar.edu.br/incantare/article/download/3680/pdf_108/10570/" target="_blank" class="artigo-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        Abrir artigo
+                    </a>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="modal-count">10 artigos científicos disponíveis</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
