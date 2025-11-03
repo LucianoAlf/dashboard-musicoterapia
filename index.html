@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Premium - Pesquisa Musicoterapia</title>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="shortcut icon" href="/favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
@@ -486,41 +483,24 @@
         .badge-danger { background: #fee2e2; color: #991b1b; }
         .badge-info { background: #dbeafe; color: #1e40af; }
         
-        /* CSS com alta especificidade para evitar conflitos com Tailwind */
-        select,
-        .filter-select,
-        .card select,
-        div.card select {
-            width: 100% !important;
+        select {
+            width: 100%;
             padding: 12px 45px 12px 16px !important;
             border: 2px solid #e5e7eb !important;
             border-radius: 12px !important;
             background: white !important;
             font-size: 14px !important;
             font-weight: 500 !important;
-            appearance: none !important;
-            -webkit-appearance: none !important;
-            -moz-appearance: none !important;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238b5cf6' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
-            background-repeat: no-repeat !important;
-            background-position: right 12px center !important;
-            background-size: 20px !important;
-            cursor: pointer !important;
-            transition: all 0.3s ease !important;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238b5cf6' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
             line-height: 1.5 !important;
             text-indent: 0 !important;
             padding-left: 16px !important;
-            box-sizing: border-box !important;
-        }
-        
-        /* Seletores específicos por ID para máxima precedência */
-        #filtroGenero,
-        #filtroIdade,
-        #filtroP1 {
-            padding: 12px 45px 12px 16px !important;
-            padding-left: 16px !important;
-            text-indent: 0 !important;
-            box-sizing: border-box !important;
         }
         
         select:focus {
@@ -549,39 +529,6 @@
             margin-top: 0 !important;
         }
         
-        /* Reset específico para evitar interferência do Tailwind */
-        .filter-select {
-            all: unset !important;
-            width: 100% !important;
-            padding: 12px 45px 12px 16px !important;
-            border: 2px solid #e5e7eb !important;
-            border-radius: 12px !important;
-            background: white !important;
-            font-size: 14px !important;
-            font-weight: 500 !important;
-            appearance: none !important;
-            -webkit-appearance: none !important;
-            -moz-appearance: none !important;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238b5cf6' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
-            background-repeat: no-repeat !important;
-            background-position: right 12px center !important;
-            background-size: 20px !important;
-            cursor: pointer !important;
-            transition: all 0.3s ease !important;
-            line-height: 1.5 !important;
-            text-indent: 0 !important;
-            padding-left: 16px !important;
-            box-sizing: border-box !important;
-            font-family: 'Inter', sans-serif !important;
-            color: #374151 !important;
-        }
-        
-        .filter-select:focus {
-            outline: none !important;
-            border-color: #8b5cf6 !important;
-            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1) !important;
-        }
-        
         label {
             display: block !important;
             font-size: 13px !important;
@@ -608,6 +555,17 @@
             white-space: nowrap;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            max-width: 100% !important;
+        }
+        
+        @media (max-width: 640px) {
+            .chart-bar {
+                font-size: 12px !important;
+                padding: 10px 14px !important;
+                white-space: normal !important;
+                word-wrap: break-word;
+                line-height: 1.3;
+            }
         }
         
         .chart-bar:hover {
@@ -967,7 +925,7 @@
             <div class="grid-4">
                 <div>
                     <label>Gênero</label>
-                    <select id="filtroGenero" class="filter-select" onchange="aplicarFiltros()" style="padding: 12px 45px 12px 16px !important; padding-left: 16px !important; box-sizing: border-box !important;">
+                    <select id="filtroGenero" onchange="aplicarFiltros()" style="padding: 12px 45px 12px 16px !important; text-indent: 0 !important;">
                         <option value="todos">Todos</option>
                         <option value="Feminino">Feminino</option>
                         <option value="Masculino">Masculino</option>
@@ -975,7 +933,7 @@
                 </div>
                 <div>
                     <label>Faixa Etária</label>
-                    <select id="filtroIdade" class="filter-select" onchange="aplicarFiltros()" style="padding: 12px 45px 12px 16px !important; padding-left: 16px !important; box-sizing: border-box !important;">
+                    <select id="filtroIdade" onchange="aplicarFiltros()" style="padding: 12px 45px 12px 16px !important; text-indent: 0 !important;">
                         <option value="todos">Todas as idades</option>
                         <option value="20-30">20-30 anos</option>
                         <option value="31-40">31-40 anos</option>
@@ -984,7 +942,7 @@
                 </div>
                 <div>
                     <label>Pergunta 1</label>
-                    <select id="filtroP1" class="filter-select" onchange="aplicarFiltros()" style="padding: 12px 45px 12px 16px !important; padding-left: 16px !important; box-sizing: border-box !important;">
+                    <select id="filtroP1" onchange="aplicarFiltros()" style="padding: 12px 45px 12px 16px !important; text-indent: 0 !important;">
                         <option value="todos">Todas</option>
                         <option value="Sim">Sim</option>
                         <option value="Não">Não</option>
@@ -1479,16 +1437,18 @@
 
         function atualizarGraficoComparativo(stats) {
             const container = document.getElementById('chartComparativo');
-            const maxWidth = 700;
+            // Ajustar maxWidth baseado no tamanho da tela
+            const isMobile = window.innerWidth <= 640;
+            const maxWidth = isMobile ? Math.min(window.innerWidth - 80, 300) : 700;
             
             container.innerHTML = `
                 <div style="margin-bottom: 28px;">
                     <div style="font-size: 14px; color: #4b5563; margin-bottom: 12px; font-weight: 700; letter-spacing: 0.3px;">P1: Já ouviu falar sobre musicoterapia</div>
-                    <div style="display: flex; gap: 12px;">
-                        <div class="chart-bar" style="background: linear-gradient(135deg, #10b981, #059669); width: ${Math.max((stats.p1Sim/stats.total)*maxWidth, 100)}px;">
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <div class="chart-bar" style="background: linear-gradient(135deg, #10b981, #059669); width: ${Math.max((stats.p1Sim/stats.total)*maxWidth, isMobile ? 100 : 100)}px;">
                             Sim: ${stats.p1Sim} (${Math.round((stats.p1Sim/stats.total)*100)}%)
                         </div>
-                        <div class="chart-bar" style="background: linear-gradient(135deg, #ef4444, #dc2626); width: ${Math.max((stats.p1Nao/stats.total)*maxWidth, 100)}px;">
+                        <div class="chart-bar" style="background: linear-gradient(135deg, #ef4444, #dc2626); width: ${Math.max((stats.p1Nao/stats.total)*maxWidth, isMobile ? 100 : 100)}px;">
                             Não: ${stats.p1Nao} (${Math.round((stats.p1Nao/stats.total)*100)}%)
                         </div>
                     </div>
@@ -1496,24 +1456,24 @@
                 <div style="margin-bottom: 28px;">
                     <div style="font-size: 14px; color: #4b5563; margin-bottom: 12px; font-weight: 700; letter-spacing: 0.3px;">P2: Nível de conhecimento</div>
                     <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                        <div class="chart-bar" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); width: ${Math.max((stats.p2Conhece/stats.total)*maxWidth, 200)}px;">
+                        <div class="chart-bar" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); width: ${Math.max((stats.p2Conhece/stats.total)*maxWidth, isMobile ? 140 : 200)}px;">
                             Conhece bem: ${stats.p2Conhece} (${Math.round((stats.p2Conhece/stats.total)*100)}%)
                         </div>
-                        <div class="chart-bar" style="background: linear-gradient(135deg, #f59e0b, #d97706); width: ${Math.max((stats.p2JaOuviu/stats.total)*maxWidth, 140)}px;">
+                        <div class="chart-bar" style="background: linear-gradient(135deg, #f59e0b, #d97706); width: ${Math.max((stats.p2JaOuviu/stats.total)*maxWidth, isMobile ? 120 : 140)}px;">
                             Já ouvi falar: ${stats.p2JaOuviu} (${Math.round((stats.p2JaOuviu/stats.total)*100)}%)
                         </div>
-                        <div class="chart-bar" style="background: linear-gradient(135deg, #ef4444, #dc2626); width: ${Math.max((stats.p2NaoConhece/stats.total)*maxWidth, 140)}px;">
+                        <div class="chart-bar" style="background: linear-gradient(135deg, #ef4444, #dc2626); width: ${Math.max((stats.p2NaoConhece/stats.total)*maxWidth, isMobile ? 120 : 140)}px;">
                             Não conheço: ${stats.p2NaoConhece} (${Math.round((stats.p2NaoConhece/stats.total)*100)}%)
                         </div>
                     </div>
                 </div>
                 <div>
                     <div style="font-size: 14px; color: #4b5563; margin-bottom: 12px; font-weight: 700; letter-spacing: 0.3px;">P3: Música contribui para desenvolvimento</div>
-                    <div style="display: flex; gap: 12px;">
-                        <div class="chart-bar" style="background: linear-gradient(135deg, #3b82f6, #2563eb); width: ${Math.max((stats.p3Sim/stats.total)*maxWidth, 100)}px;">
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <div class="chart-bar" style="background: linear-gradient(135deg, #3b82f6, #2563eb); width: ${Math.max((stats.p3Sim/stats.total)*maxWidth, isMobile ? 100 : 100)}px;">
                             Sim: ${stats.p3Sim} (${Math.round((stats.p3Sim/stats.total)*100)}%)
                         </div>
-                        <div class="chart-bar" style="background: linear-gradient(135deg, #ef4444, #dc2626); width: ${Math.max((stats.p3Nao/stats.total)*maxWidth, 120)}px;">
+                        <div class="chart-bar" style="background: linear-gradient(135deg, #ef4444, #dc2626); width: ${Math.max((stats.p3Nao/stats.total)*maxWidth, isMobile ? 100 : 120)}px;">
                             Não: ${stats.p3Nao} (${Math.round((stats.p3Nao/stats.total)*100)}%)
                         </div>
                     </div>
@@ -1610,7 +1570,7 @@
             atualizarDashboard();
         };
         
-        // Recalcular canvas ao redimensionar (rotação de tela em mobile)
+        // Recalcular canvas e barras ao redimensionar (rotação de tela em mobile)
         window.addEventListener('resize', function() {
             atualizarDashboard();
         });
